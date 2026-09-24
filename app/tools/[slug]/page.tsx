@@ -122,6 +122,10 @@ export default function ToolDetailsPage() {
   useEffect(() => {
     if (!tool) return;
 
+    // Store the non-null tool in a local constant.
+    // This prevents TypeScript null errors inside the async function.
+    const currentTool = tool;
+
     const controller = new AbortController();
 
     async function fetchRelatedTools() {
@@ -130,7 +134,7 @@ export default function ToolDetailsPage() {
       try {
         const response = await fetch(
           `http://localhost:4000/api/tools?category=${encodeURIComponent(
-            tool.category
+            currentTool.category
           )}`,
           {
             signal: controller.signal,
@@ -145,7 +149,9 @@ export default function ToolDetailsPage() {
           await response.json();
 
         const related = data.tools
-          .filter((item) => item.slug !== tool.slug)
+          .filter(
+            (item) => item.slug !== currentTool.slug
+          )
           .slice(0, 3);
 
         setRelatedTools(related);
@@ -265,6 +271,7 @@ export default function ToolDetailsPage() {
           </Link>
 
           <div className="hidden gap-8 text-sm text-zinc-400 md:flex">
+
             <Link
               href="/"
               className="hover:text-white"
@@ -292,6 +299,7 @@ export default function ToolDetailsPage() {
             >
               Learn
             </Link>
+
           </div>
 
           <button
